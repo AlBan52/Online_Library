@@ -211,3 +211,6 @@ poetry.lock
 
 # Debugging files and manual py tests
 my_tests/
+
+# Results of project launch
+books/
