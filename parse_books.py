@@ -2,6 +2,7 @@ import os
 import requests
 
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
   
 def check_for_redirect(response):
@@ -9,6 +10,12 @@ def check_for_redirect(response):
        raise HTTPError
     else:
        pass
+
+def get_response(url, header):
+    response = requests.get(url, params=header, allow_redirects=False)
+    response.raise_for_status()
+
+    return response
 
         
 if __name__ == '__main__':
@@ -19,8 +26,9 @@ if __name__ == '__main__':
     books_number = 10
 
     for book_id in range(1, books_number+1):
-        response = requests.get(url, params={'id': book_id}, allow_redirects=False)
-        response.raise_for_status()
+        header = {'id': book_id}
+        response = get_response(url, header)
+        
         try:
             check_for_redirect(response)
         except:
