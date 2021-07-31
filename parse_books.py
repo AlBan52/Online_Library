@@ -1,22 +1,29 @@
 import os
 import requests
 
-from dotenv import load_dotenv
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 
   
-def check_for_redirect(response):
-    if response.status_code != 200:
-       raise HTTPError
-    else:
-       pass
-
 def get_response(url, header):
     response = requests.get(url, params=header, allow_redirects=False)
     response.raise_for_status()
 
     return response
 
+def check_for_redirect(response):
+    if response.status_code != 200:
+       raise HTTPError
+    else:
+       pass
+
+def download_txt(url, filename, folder='books'):
+    response = get_response(url, header)
+    filename = f'{sanitize_filename(filename)}.txt'
+    filepath = os.path.join(folder, filename)
+    with open(filepath, 'w', encoding='utf-8') as file: file.write(response.text)
+
+    return filepath
         
 if __name__ == '__main__':
     load_dotenv()
