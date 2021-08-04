@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from pathvalidate import sanitize_filename
+from urllib.parse import urljoin
 
   
 def get_response(url, header=None):
@@ -43,6 +44,7 @@ def create_filepath(filename, folder='books'):
     return filepath
 
 def download_txt(url, filepath):
+    os.makedirs('books', exist_ok=True)
     url = f'{url}txt.php'
     response = get_response(url, header={'id': book_id})
     try:
@@ -51,21 +53,48 @@ def download_txt(url, filepath):
         return
     with open(filepath, 'w', encoding='utf-8') as file: file.write(response.text)
 
+def get_image_link(url, book_id):
+    url = f'{url}b{book_id}/'
+    response = get_response(url)
+    try:
+        check_for_redirect(response)
+    except:
+        return
+    soup = BeautifulSoup(response.text, 'lxml')
+    image_link = soup.find(id = 'content').find('img')['src']
+    full_image_link = urljoin(url, image_link)
+     
+    return full_image_link
+
+def download_images(full_image_link, folder='images'):
+    os.makedirs('images', exist_ok=True)
+    url = full_image_link
+    image_name = full_image_link.split('/')[-1]
+    image_path = os.path.join(folder, image_name)
+    response = get_response(url)
+    try:
+        check_for_redirect(response)
+    except:
+        return
+    with open(image_path, 'wb') as file: file.write(response.content)
+
         
 if __name__ == '__main__':
     load_dotenv()
     url = os.getenv('URL_FOR_DOWNLOADING')
-    os.makedirs('books', exist_ok=True)
+    
 
     books_number = 10
 
     for book_id in range(1, books_number+1):
         book_title = get_book_title(url, book_id)
+        full_image_link = get_image_link(url, book_id)
         if book_title:
             filename = create_filename(book_title, book_id)
             filepath = create_filepath(filename, folder='books')
         else:
             continue
         
-        download_txt(url, filepath)   
+        download_txt(url, filepath)
+        download_images(full_image_link, folder='images')   
         
