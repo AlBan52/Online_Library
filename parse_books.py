@@ -78,6 +78,22 @@ def download_images(full_image_link, folder='images'):
         return
     with open(image_path, 'wb') as file: file.write(response.content)
 
+def get_comments(url):
+   url = f'{url}b{book_id}/'
+   response = get_response(url)
+   try:
+      check_for_redirect(response)
+   except:
+      return
+   soup = BeautifulSoup(response.text, 'lxml')
+   raw_comments = soup.find_all(class_='texts')
+   
+   comments_texts = []
+   for comment in raw_comments:
+      comment = comment.find('span').text
+      comments_texts.append(comment)
+       
+   return comments_texts
         
 if __name__ == '__main__':
     load_dotenv()
@@ -92,6 +108,7 @@ if __name__ == '__main__':
         if book_title:
             filename = create_filename(book_title, book_id)
             filepath = create_filepath(filename, folder='books')
+            comments_texts = get_comments(url)
         else:
             continue
         
