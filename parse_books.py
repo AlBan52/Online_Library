@@ -112,6 +112,17 @@ def get_book_genres(url):
       
    return book_genres        
 
+def parse_book_page(url):
+   book_title = get_book_title(url, book_id)
+   book_genres = get_book_genres(url)
+   comments_texts = get_comments(url)
+   about_book = {'Название': book_title,
+                 'Жанр': book_genres,
+                 'Комментарии': comments_texts
+                 }
+
+   return about_book
+
 
 if __name__ == '__main__':
     load_dotenv()
@@ -121,14 +132,16 @@ if __name__ == '__main__':
     books_number = 10
 
     for book_id in range(1, books_number+1):
-        book_title = get_book_title(url, book_id)
+        about_book = parse_book_page(url)
+        # book_title = get_book_title(url, book_id)
         full_image_link = get_image_link(url, book_id)
-        if book_title:
-            filename = create_filename(book_title, book_id)
-            filepath = create_filepath(filename, folder='books')
-            comments_texts = get_comments(url)
-            book_genres = get_book_genres(url)
-            
+        if about_book:
+        # if book_title:
+        #     filename = create_filename(book_title, book_id)
+        #     filepath = create_filepath(filename, folder='books')
+        #     comments_texts = get_comments(url)
+        #     book_genres = get_book_genres(url)
+            print(about_book)
         else:
             continue
         
