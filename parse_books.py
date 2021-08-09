@@ -94,7 +94,25 @@ def get_comments(url):
       comments_texts.append(comment)
        
    return comments_texts
-        
+
+def get_book_genres(url):
+   url = f'{url}b{book_id}/'
+   response = get_response(url)
+   try:
+      check_for_redirect(response)
+   except:
+      return
+   soup = BeautifulSoup(response.text, 'lxml')
+   raw_book_genres = soup.find('span', class_='d_book').find_all('a')
+   
+   book_genres = []
+   for genre in raw_book_genres:
+      genre = genre.text
+      book_genres.append(genre)
+      
+   return book_genres        
+
+
 if __name__ == '__main__':
     load_dotenv()
     url = os.getenv('URL_FOR_DOWNLOADING')
@@ -109,6 +127,8 @@ if __name__ == '__main__':
             filename = create_filename(book_title, book_id)
             filepath = create_filepath(filename, folder='books')
             comments_texts = get_comments(url)
+            book_genres = get_book_genres(url)
+            
         else:
             continue
         
