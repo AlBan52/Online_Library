@@ -214,3 +214,10 @@ my_tests/
 
 # Results of project launch
 books/
+
+# Image files
+*.jpg
+*.jpeg
+*.tiff
+*.png
+*.bmp
