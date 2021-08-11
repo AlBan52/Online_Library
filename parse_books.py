@@ -1,3 +1,4 @@
+import argparse
 import os
 import requests
 
@@ -7,6 +8,15 @@ from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
 
   
+def parse_books_interval():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('start_book_id', type=int)
+    parser.add_argument('end_book_id', type=int)
+    args = parser.parse_args()
+    start_book_id = args.start_book_id
+    end_book_id = args.end_book_id
+    return start_book_id, end_book_id
+
 def get_response(url, header=None):
     response = requests.get(url, params=header, allow_redirects=False)
     response.raise_for_status()
@@ -127,13 +137,10 @@ def parse_book_page(url):
 if __name__ == '__main__':
     load_dotenv()
     url = os.getenv('URL_FOR_DOWNLOADING')
+    start_book_id, end_book_id = parse_books_interval()
     
-
-    books_number = 10
-
-    for book_id in range(1, books_number+1):
+    for book_id in range(start_book_id, end_book_id+1):
         about_book = parse_book_page(url)
-        # book_title = get_book_title(url, book_id)
         full_image_link = get_image_link(url, book_id)
         if about_book:
         # if book_title:
@@ -141,10 +148,11 @@ if __name__ == '__main__':
         #     filepath = create_filepath(filename, folder='books')
         #     comments_texts = get_comments(url)
         #     book_genres = get_book_genres(url)
-            print(about_book)
+            # print(about_book)
+            download_txt(url, filepath)
+            download_images(full_image_link, folder='images')
         else:
             continue
         
-        download_txt(url, filepath)
-        download_images(full_image_link, folder='images')   
+           
         
