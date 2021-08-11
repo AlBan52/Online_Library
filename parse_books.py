@@ -42,20 +42,12 @@ def get_book_title(url, book_id):
 
     return book_title
 
-def create_filename(book_title, book_id):
-    filename = f'{sanitize_filename(book_title)}.txt'
-    filename = f'{book_id}_{filename}'
-
-    return filename
-
-def create_filepath(filename, folder='books'):
-    filepath = os.path.join(folder, filename)
-
-    return filepath
-
-def download_txt(url, filepath):
+def download_txt(url, book_title, folder='books'):
     os.makedirs('books', exist_ok=True)
     url = f'{url}txt.php'
+    filename = f'{sanitize_filename(book_title)}.txt'
+    filename = f'{book_id}_{filename}'
+    filepath = os.path.join(folder, filename)
     response = get_response(url, header={'id': book_id})
     try:
         check_for_redirect(response)
@@ -131,7 +123,7 @@ def parse_book_page(url):
                  'Комментарии': comments_texts
                  }
 
-   return about_book
+   return book_title, about_book
 
 
 if __name__ == '__main__':
@@ -140,16 +132,10 @@ if __name__ == '__main__':
     start_book_id, end_book_id = parse_books_interval()
     
     for book_id in range(start_book_id, end_book_id+1):
-        about_book = parse_book_page(url)
+        book_title, about_book = parse_book_page(url)
         full_image_link = get_image_link(url, book_id)
-        if about_book:
-        # if book_title:
-        #     filename = create_filename(book_title, book_id)
-        #     filepath = create_filepath(filename, folder='books')
-        #     comments_texts = get_comments(url)
-        #     book_genres = get_book_genres(url)
-            # print(about_book)
-            download_txt(url, filepath)
+        if book_title and about_book:
+            download_txt(url, book_title, folder='books')
             download_images(full_image_link, folder='images')
         else:
             continue
